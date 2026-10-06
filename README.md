@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚡ 3D Cyberpunk Portfolio // High-Impact Engineering Showcase
 
-## Getting Started
+A futuristic, high-performance 3D portfolio website built with **Next.js 16 (App Router)**, **React 19**, **Three.js / React Three Fiber**, **Tailwind CSS**, and synthesized **Web Audio API**.
 
-First, run the development server:
+Designed specifically to captivate technical recruiters, hiring managers, and design leads.
 
+---
+
+## 🌟 Recruiter-Magnet Features
+
+1. **⚡ "Recruiter Speedrun Mode" (30-Second Dossier)**
+   - Located prominently in the header and hero section.
+   - Instantly brings up an executive HUD summary of candidate metrics, top 3 flagship projects, stack proficiency, 1-click resume download, and 1-click email copy with celebratory confetti.
+   - Solves the #1 problem recruiters face with 3D portfolios: *speed and scannability*.
+
+2. **🪐 Interactive 3D Quantum Core & Skills Orbit**
+   - Built with **Three.js** and **React Three Fiber**.
+   - Dual neon gyroscopic rings, pulsing glowing icosahedron core, additive blending starfield particles.
+   - Interactive orbit nodes (Next.js, Three.js, TypeScript, Go, WebGPU, AI/LLM, PostgreSQL) with interactive 3D HUD tags that respond to mouse rotation and hovering.
+
+3. **🎴 3D Tilt Interactive Project Cards**
+   - Realistic 3D card tilt and specular glare reacting dynamically to cursor coordinates.
+   - Filterable by project category (*Fullstack*, *3D / Creative*, *DevOps / Systems*, *AI / ML*).
+   - "Architecture & Deep-Dive" modal breakdown for engineering rigor.
+
+4. **⌨️ Cyber Terminal CLI (`Ctrl + K` / `Cmd + K`)**
+   - Interactive terminal modal allowing power users to query `projects`, `skills`, `contact`, `hire`, and easter eggs (`whoami`, `sudo rm -rf /`).
+
+5. **🔊 Synthesized Web Audio Micro-Interactions**
+   - Zero external audio assets (100% generated in real-time with Web Audio API oscillators).
+   - Muted by default with a clean audio toggle in the navigation bar.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router) + React 19 + TypeScript
+- **3D Graphics**: Three.js + `@react-three/fiber` + `@react-three/drei`
+- **Styling**: Tailwind CSS + custom Cyberpunk HUD CSS utilities
+- **Icons**: Lucide React + custom inline SVGs
+- **Celebrations & Audio**: `canvas-confetti` + Web Audio API Synthesizer
+
+---
+
+## 🚀 Quick Start
+
+The dev server is currently running at:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To run manually:
+```bash
+# Start development server
+npm run dev
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Build for production
+npm run build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Start production server
+npm run start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## ✏️ How to Customize with Your Own Info
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+All personal content, project descriptions, skills, and links are organized inside a single configuration file:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+👉 [src/data/portfolioData.ts](file:///d:/portfolio/src/data/portfolioData.ts)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+You can update:
+- `profile.name`, `role`, `tagline`, `shortBio`, `location`, `email`, and social links.
+- `profile.metrics` (e.g. apps shipped, performance improvements).
+- `projects` (add your own titles, live URLs, GitHub repositories, and impact statements).
+- `skillCategories` (adjust percentages and tech stack pills).
+- `experiences` (update your employment history and highlights).
