@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Send, Copy, Check, Sparkles, Zap, Phone, MapPin } from "lucide-react";
+import { Mail, Send, Copy, Check, Sparkles, Zap, Phone, MapPin, Loader2, AlertCircle } from "lucide-react";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/ui/Icons";
 import { PORTFOLIO_DATA } from "@/data/portfolioData";
 import { soundManager } from "@/lib/sound";
@@ -11,6 +11,8 @@ export function ContactSection({ onOpenRecruiterModal }: { onOpenRecruiterModal:
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -32,10 +34,49 @@ export function ContactSection({ onOpenRecruiterModal }: { onOpenRecruiterModal:
     setTimeout(() => setCopiedPhone(false), 2500);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    soundManager.playSuccess();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${profile.email}`, {
+        method: "POST",
+        referrerPolicy: "origin",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          _replyto: formData.email,
+          _subject: `[Portfolio Signal] ${formData.subject} — from ${formData.name}`,
+          subject: formData.subject,
+          message: formData.message,
+          _template: "table",
+          _captcha: "false",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success !== "false" && data.success !== false) {
+        soundManager.playSuccess();
+        setSubmitted(true);
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        setErrorMessage(
+          data.message || "Unable to transmit message right now. Please try again or use direct email."
+        );
+      }
+    } catch {
+      setErrorMessage(
+        "Network error while transmitting message. Please check your connection or use direct email."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -200,14 +241,16 @@ export function ContactSection({ onOpenRecruiterModal }: { onOpenRecruiterModal:
                   </div>
                   <h4 className="text-lg font-bold text-white">Signal Received!</h4>
                   <p className="text-xs text-gray-400 max-w-sm mx-auto">
-                    Thank you for reaching out. I will respond to your transmission promptly.
+                    Your message has been transmitted directly to{" "}
+                    <span className="text-cyan-400">{profile.email}</span>. I will respond to your transmission promptly.
                   </p>
                   <button
                     onClick={() => {
                       setSubmitted(false);
+                      setErrorMessage(null);
                       setFormData({ name: "", email: "", subject: "", message: "" });
                     }}
-                    className="text-xs text-cyan-400 underline pt-2"
+                    className="text-xs text-cyan-400 underline pt-2 cursor-pointer"
                   >
                     Send another message
                   </button>
@@ -219,14 +262,16 @@ export function ContactSection({ onOpenRecruiterModal }: { onOpenRecruiterModal:
                       <label className="text-gray-400 block font-bold">YOUR NAME / ORG</label>
                       <input
                         type="text"
+                        name="name"
                         required
+                        disabled={isSubmitting}
                         value={formData.name}
                         onChange={(e) => {
                           soundManager.playKey();
                           setFormData({ ...formData, name: e.target.value });
                         }}
                         placeholder="e.g. Talent Acquisition Lead"
-                        className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors"
+                        className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
                       />
                     </div>
 
@@ -234,14 +279,16 @@ export function ContactSection({ onOpenRecruiterModal }: { onOpenRecruiterModal:
                       <label className="text-gray-400 block font-bold">EMAIL ADDRESS</label>
                       <input
                         type="email"
+                        name="email"
                         required
+                        disabled={isSubmitting}
                         value={formData.email}
                         onChange={(e) => {
                           soundManager.playKey();
                           setFormData({ ...formData, email: e.target.value });
                         }}
                         placeholder="recruiter@company.com"
-                        className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors"
+                        className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -250,37 +297,69 @@ export function ContactSection({ onOpenRecruiterModal }: { onOpenRecruiterModal:
                     <label className="text-gray-400 block font-bold">ROLE / SUBJECT</label>
                     <input
                       type="text"
+                      name="subject"
                       required
+                      disabled={isSubmitting}
                       value={formData.subject}
                       onChange={(e) => {
                         soundManager.playKey();
                         setFormData({ ...formData, subject: e.target.value });
                       }}
                       placeholder="e.g. UI Developer / Frontend Engineer Opportunity"
-                      className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors"
+                      className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
                     />
                   </div>
 
                   <div className="space-y-1.5">
                     <label className="text-gray-400 block font-bold">TRANSMISSION MESSAGE</label>
                     <textarea
+                      name="message"
                       required
                       rows={4}
+                      disabled={isSubmitting}
                       value={formData.message}
                       onChange={(e) => {
                         soundManager.playKey();
                         setFormData({ ...formData, message: e.target.value });
                       }}
                       placeholder="Share details on your opportunity, tech stack, or engineering project..."
-                      className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors resize-none"
+                      className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors resize-none disabled:opacity-50"
                     />
                   </div>
 
+                  {errorMessage && (
+                    <div className="p-3 rounded-lg bg-red-950/50 border border-red-500/40 text-red-300 flex flex-col gap-2">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                        <span>{errorMessage}</span>
+                      </div>
+                      <a
+                        href={`mailto:${profile.email}?subject=${encodeURIComponent(
+                          formData.subject || "Portfolio Inquiry"
+                        )}&body=${encodeURIComponent(
+                          `From: ${formData.name} (${formData.email})\n\n${formData.message}`
+                        )}`}
+                        className="text-cyan-400 hover:text-cyan-300 underline self-start"
+                      >
+                        Click here to send directly via your email client →
+                      </a>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(0,240,255,0.4)] transition-all hover:scale-[1.01] active:scale-[0.99]"
+                    disabled={isSubmitting}
+                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(0,240,255,0.4)] transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
-                    <Send className="w-4 h-4" /> TRANSMIT MESSAGE SIGNAL
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" /> TRANSMITTING SIGNAL...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" /> TRANSMIT MESSAGE SIGNAL
+                      </>
+                    )}
                   </button>
                 </form>
               )}
